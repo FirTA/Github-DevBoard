@@ -1,0 +1,18 @@
+const searchUserAPI = (username) =>
+  fetch(`https://api.github.com/search/users?q=${username}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Error fetching user data:", error);
+      throw error; // Re-throw the error to handle it in the calling function
+    });
+
+export { searchUserAPI };
