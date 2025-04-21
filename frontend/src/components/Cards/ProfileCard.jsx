@@ -1,19 +1,6 @@
 import { UserIcon, UsersIcon, BookIcon, ActivityIcon } from "lucide-react";
 
 const ProfileCard = ({ userData }) => {
-  if (!userData) {
-    return (
-      <div className="text-center py-16">
-        <h2 className="text-xl font-bold mb-4">
-          Welcome to the GitHub Dashboard
-        </h2>
-        <p className="mb-4 text-gray-600">
-          Use the search bar above to find GitHub users and view their profiles.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center mb-6">

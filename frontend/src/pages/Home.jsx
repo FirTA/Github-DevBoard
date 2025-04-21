@@ -15,14 +15,25 @@ const Home = () => {
     fetchUser(user.login);
   }, [user]);
 
+  useEffect(() => {
+    console.log("isLoading state:", isLoading);
+  }, [isLoading]);
+
   const fetchUser = async (username) => {
+    if (!username) return;
     setIsLoading(true);
-    const response = await fetchUserData(username);
-    console.log("Response:", response);
-    if (response) {
-      setUserData(response);
+    try {
+      const response = await fetchUserData(username);
+      console.log("Response:", response);
+      if (response) {
+        setUserData(response);
+        setIsLoading(false);
+        console.log("User data fetched:", response);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
       setIsLoading(false);
-      console.log("User data fetched:", response);
     }
   };
 
@@ -38,8 +49,6 @@ const Home = () => {
         </div>
       </header>
       <main className="container mx-auto px-4 py-6">
-        {isLoading && <LoadingOverlay />}
-        {userData && !isLoading && <ProfileCard userData={userData} />}
         {!userData && !isLoading && (
           <div className="text-center py-16">
             <h2 className="text-xl font-bold mb-4">
@@ -51,6 +60,8 @@ const Home = () => {
             </p>
           </div>
         )}
+        {isLoading && <LoadingOverlay />}
+        {userData && !isLoading && <ProfileCard userData={userData} />}
       </main>
     </div>
   );
