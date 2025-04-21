@@ -12,7 +12,7 @@ const searchUserAPI = (username) =>
     })
     .catch((error) => {
       console.error("Error fetching user data:", error);
-      throw error; // Re-throw the error to handle it in the calling function
+      throw error;
     });
 
 const fetchUserData = (username) =>
@@ -29,25 +29,7 @@ const fetchUserData = (username) =>
     })
     .catch((error) => {
       console.error("Error fetching user data:", error);
-      throw error; // Re-throw the error to handle it in the calling function
+      throw error;
     });
 
-const getUserDetails = (username) => {
-  fetch(`https://api.github.com/users/${username}`, {
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("Error fetching user data:", error);
-      throw error; // Re-throw the error to handle it in the calling function
-    });
-};
-
-export { searchUserAPI, fetchUserData, getUserDetails };
+export { searchUserAPI, fetchUserData };
