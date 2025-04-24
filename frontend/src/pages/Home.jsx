@@ -5,6 +5,9 @@ import { UserIcon, UsersIcon, BookIcon, ActivityIcon } from "lucide-react";
 import ProfileCard from "../components/Cards/ProfileCard";
 import LoadingOverlay from "../components/LoadingOverlay";
 import LanguageUsageCard from "../components/Cards/LanguageUsageCard";
+import TechnicalAnaylsis from "../components/Cards/TechnicalAnaylsis";
+import RepoStats from "../components/Cards/RepoStats";
+import ActivityCard from "../components/Cards/ActivityCard";
 
 const Home = () => {
   const [user, setUser] = useState("");
@@ -69,6 +72,9 @@ const Home = () => {
           <>
             <ProfileCard userData={userData} />
             <LanguageUsageCard repositories={userRepo} />
+            <TechnicalAnaylsis repositories={userRepo} />
+            <RepoStats repositories={userRepo} />
+            <ActivityCard repositories={userRepo} />
           </>
         )}
       </main>

@@ -21,7 +21,6 @@ const LanguageUsageCard = ({ repositories }) => {
   const [languageData, setLanguageData] = useState([]);
 
   useEffect(() => {
-    console.log("Repositories data:", repositories);
     const languages = {};
     repositories.forEach((repo) => {
       if (repo.language)
