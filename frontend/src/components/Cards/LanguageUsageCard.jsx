@@ -64,8 +64,7 @@ const LanguageUsageCard = ({ repositories }) => {
   };
 
   // Custom Legend with perventages
-  const renderLegendText = (value, entry) => {
-    const { color } = entry;
+  const renderLegendText = (value) => {
     const item = languageData.find((item) => item.name === value);
     const percentage = item ? ((item.value / total) * 100).toFixed(0) : 0;
 
