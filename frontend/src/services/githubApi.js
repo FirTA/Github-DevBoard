@@ -32,4 +32,24 @@ const fetchUserData = (username) =>
       throw error;
     });
 
-export { searchUserAPI, fetchUserData };
+const fetchUserRepos = (username) =>
+  fetch(
+    `https://api.github.com/users/${username}/repos?sort=updated&per_page=100`,
+    {
+      headers: {
+        Accept: "application/vnd.github+json",
+      },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Error fetching user repos:", error);
+      throw error;
+    });
+
+export { searchUserAPI, fetchUserData, fetchUserRepos };

@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar"; // Adjust the import path as necessary
-import { fetchUserData } from "../services/githubApi"; // Adjust the import path as necessary
+import { fetchUserData, fetchUserRepos } from "../services/githubApi"; // Adjust the import path as necessary
 import { UserIcon, UsersIcon, BookIcon, ActivityIcon } from "lucide-react";
 import ProfileCard from "../components/Cards/ProfileCard";
 import LoadingOverlay from "../components/LoadingOverlay";
+import LanguageUsageCard from "../components/Cards/LanguageUsageCard";
+import TechnicalAnaylsis from "../components/Cards/TechnicalAnaylsis";
+import RepoStats from "../components/Cards/RepoStats";
+import ActivityCard from "../components/Cards/ActivityCard";
 
 const Home = () => {
   const [user, setUser] = useState("");
   const [userData, setUserData] = useState(null);
+  const [userRepo, setUserRepo] = useState([]);
+
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -23,13 +29,14 @@ const Home = () => {
     if (!username) return;
     setIsLoading(true);
     try {
-      const response = await fetchUserData(username);
-      console.log("Response:", response);
-      if (response) {
-        setUserData(response);
-        setIsLoading(false);
-        console.log("User data fetched:", response);
-      }
+      const [userData, userRepo] = await Promise.all([
+        fetchUserData(username),
+        fetchUserRepos(username),
+      ]);
+      const user = await userData;
+      const repositories = await userRepo;
+      if (user) setUserData(user);
+      if (repositories) setUserRepo(repositories);
     } catch (error) {
       console.error("Error fetching user data:", error);
     } finally {
@@ -61,7 +68,15 @@ const Home = () => {
           </div>
         )}
         {isLoading && <LoadingOverlay />}
-        {userData && !isLoading && <ProfileCard userData={userData} />}
+        {userData && !isLoading && (
+          <>
+            <ProfileCard userData={userData} />
+            <LanguageUsageCard repositories={userRepo} />
+            <TechnicalAnaylsis repositories={userRepo} />
+            <RepoStats repositories={userRepo} />
+            <ActivityCard repositories={userRepo} />
+          </>
+        )}
       </main>
     </div>
   );

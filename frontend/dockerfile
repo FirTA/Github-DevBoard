@@ -1,0 +1,11 @@
+FROM node:18-alpine
+
+WORKDIR /app/devboard-github/
+
+COPY public/ /app/devboard-github/public
+COPY src/ /app/devboard-github/src
+COPY package.json /app/devboard-github/
+
+RUN npm install
+
+CMD ["npm", "start"]
