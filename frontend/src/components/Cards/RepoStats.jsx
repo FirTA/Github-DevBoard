@@ -1,5 +1,19 @@
-import { BookIcon } from "lucide-react";
+import { BookIcon, GitForkIcon, StarIcon } from "lucide-react";
 import React, { useMemo } from "react";
+
+const StatBox = ({ value, label, icon, bgColor, textColor }) => (
+  <div
+    className={`${bgColor} rounded-lg p-4 transition-all duration-200 hover:shadow-md`}
+  >
+    <div className="flex items-center mb-2">
+      <span className={`${textColor} mr-2`}>{icon}</span>
+      <span className="text-gray-700 text-sm font-medium">{label}</span>
+    </div>
+    <div className={`text-2xl font-bold ${textColor}`}>
+      {value.toLocaleString()}
+    </div>
+  </div>
+);
 
 const RepoStats = ({ repositories }) => {
   const stats = useMemo(() => {
@@ -13,36 +27,90 @@ const RepoStats = ({ repositories }) => {
       (sum, repo) => sum + repo.forks_count,
       0
     );
+
+    const avgStarsPerRepo =
+      totalRepos > 0 ? (totalStars / totalRepos).toFixed(1) : 0;
+    const mostStarredRepo =
+      repositories.length > 0
+        ? repositories.reduce((prev, current) =>
+            prev.stargazers_count > current.stargazers_count ? prev : current
+          )
+        : null;
+
     return {
       totalForks,
       totalRepos,
       totalStars,
+      avgStarsPerRepo,
+      mostStarredRepo,
     };
   }, [repositories]);
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl mb-6 font-bold flex items-center">
-        <BookIcon size={20} className="mr-2" />
-        Repository Statistics
-      </h2>
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-blue-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-blue-700">
-            {stats.totalRepos}
-          </div>
-          <div className="text-sm text-gray-600">Repositories</div>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {/* Header with gradient */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+        <h2 className="text-xl font-bold text-white flex items-center">
+          <BookIcon size={20} className="mr-2" />
+          Repository Statistics
+        </h2>
+      </div>
+
+      {/* Stats section */}
+      <div className="p-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+          <StatBox
+            value={stats.totalRepos}
+            label="Repositories"
+            icon={<BookIcon size={18} />}
+            bgColor="bg-blue-50"
+            textColor="text-blue-700"
+          />
+          <StatBox
+            value={stats.totalStars}
+            label="Total Stars"
+            icon={<StarIcon size={18} />}
+            bgColor="bg-yellow-50"
+            textColor="text-yellow-700"
+          />
+          <StatBox
+            value={stats.totalForks}
+            label="Total Forks"
+            icon={<GitForkIcon size={18} />}
+            bgColor="bg-green-50"
+            textColor="text-green-700"
+          />
         </div>
-        <div className="bg-yellow-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-yellow-700">
-            {stats.totalStars}
+
+        {/* Additional stats */}
+        <div className="mt-4 border-gray-100 pt-4">
+          <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wider mb-3">
+            Additional Insight
+          </h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Average Stars Per Repo</span>
+              <span className="font-medium text-gray-500">
+                {stats.avgStarsPerRepo}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Most Starred Repository</span>
+              <a
+                href={stats.mostStarredRepo.html_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-blue-600 hover:text-blue-800"
+              >
+                <span className="font-medium mr-1">
+                  {stats.mostStarredRepo.name}
+                </span>
+                <span className="flex items-center text-yellow-600 text-sm">
+                  <StarIcon size={14} className="mr-1" />
+                  {stats.mostStarredRepo.stargazers_count}
+                </span>
+              </a>
+            </div>
           </div>
-          <div className="text-sm text-gray-600">Total Stars</div>
-        </div>
-        <div className="bg-green-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-green-700">
-            {stats.totalForks}
-          </div>
-          <div className="text-sm text-gray-600">Total Forks</div>
         </div>
       </div>
     </div>
