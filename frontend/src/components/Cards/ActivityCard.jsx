@@ -1,8 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { ActivityIcon, CalendarIcon, ClockIcon } from "lucide-react";
 
 const ActivityCard = ({ repositories }) => {
-  console.log("repositories :", repositories);
+  const [recentRepos, setRecentRepos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const activityData = useMemo(() => {
     if (!repositories.length) return null;
 
@@ -30,11 +32,57 @@ const ActivityCard = ({ repositories }) => {
         url: repo.html_url,
         description: repo.description,
         stars: repo.stargazers_count,
-        language: repo.languages_url,
+        language: repo.language,
+        languages_url: repo.languages_url,
+        languages: null,
       }));
-
     return { yearCounts, recentlyUpdated };
   }, [repositories]);
+
+  useEffect(() => {
+    if (!activityData) return;
+
+    const fetchAllLanguages = async () => {
+      setIsLoading(true);
+      try {
+        const updatedRepos = await Promise.all(
+          activityData.recentlyUpdated.map(async (repo) => {
+            try {
+              const response = await fetch(repo.languages_url);
+              const languagesData = await response.json();
+
+              // Convert languages object to array of {name, bytes} objects
+              const languagesArray = Object.entries(languagesData).map(
+                ([name, bytes]) => ({
+                  name,
+                  bytes,
+                })
+              );
+              console.log(languagesArray);
+              return {
+                ...repo,
+                languages: languagesArray,
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching languages for ${repo.name}:`,
+                error
+              );
+              return repo; // Return original repo if fetch fails
+            }
+          })
+        );
+
+        setRecentRepos(updatedRepos);
+      } catch (error) {
+        console.error("Error fetching languages:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllLanguages();
+  }, [activityData]);
 
   if (!activityData) return null;
 
@@ -105,9 +153,9 @@ const ActivityCard = ({ repositories }) => {
               <ClockIcon size={18} className="mr-2 text-cyan-600" />
               Recently Updated
             </h3>
-            {activityData.recentlyUpdated.length > 0 ? (
+            {recentRepos.length > 0 ? (
               <div className="space-y-3">
-                {activityData.recentlyUpdated.map((repo) => (
+                {recentRepos.map((repo) => (
                   <a
                     key={repo.name}
                     href={repo.url}
@@ -129,19 +177,30 @@ const ActivityCard = ({ repositories }) => {
                         {repo.description}
                       </p>
                     )}
-                    <div className="flex items-center mt-2 space-x-4 text-sm">
-                      {/* {repo.language && (
-                        <div className="flex items-center text-gray-600">
-                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 mr-1.5"></span>
-                          {repo.language}
-                        </div>
-                      )} */}
-                      {repo.stars > 0 && (
-                        <div className="flex items-center text-gray-600">
-                          <TrendingUpIcon size={14} className="mr-1" />
-                          {repo.stars} stars
-                        </div>
-                      )}
+                    <div className="mt-2">
+                      <div className="text-xs font-medium text-gray-500 mb-1">
+                        Languages:
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {repo.languages && repo.languages.length > 0 ? (
+                          repo.languages.map((lang) => (
+                            <span
+                              key={`${repo.name}-${lang.name}`}
+                              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                            >
+                              {lang.name}
+                            </span>
+                          ))
+                        ) : repo.language ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {repo.language}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-500">
+                            No languages detected
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </a>
                 ))}
